@@ -19,8 +19,8 @@ const Table = ({ todos, isLoading, setTodos }) => {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/api/todo/${id}/`);
-            const newList = todos.filter((todo) => todo.id !== id);
+            await axios.delete(`${apiLink}todo/${id}/`);
+            const newList = todos?.filter((todo) => todo.id !== id);
             setTodos(newList);
         } catch (error) {
             console.log(error);
@@ -31,7 +31,7 @@ const Table = ({ todos, isLoading, setTodos }) => {
         try {
             const response = await axios.patch(`${apiLink}todo/${id}/`, value);
             // console.log(response.data);
-            const newTodos = todos.map((todo) =>
+            const newTodos = todos?.map((todo) =>
                 todo.id === id ? response.data : todo
             );
             setTodos(newTodos);
@@ -46,7 +46,7 @@ const Table = ({ todos, isLoading, setTodos }) => {
             ...prev,
             body: e.target.value,
         }));
-        console.log(editText);
+        // console.log(editText);
     };
 
     const handleClick = () => {
