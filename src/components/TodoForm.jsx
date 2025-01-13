@@ -1,7 +1,10 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
 import axios from "axios";
+
+// plugin
+import Toast from "../plugin/Toast";
 
 // uitls
 import { apiLink } from "../utils/constants";
@@ -19,6 +22,11 @@ const TodoForm = ({ setTodos, fetchData }) => {
     };
 
     const postTodo = async () => {
+        if (!newTodo?.body) {
+            Toast("error", "Enter Data!");
+            return;
+        }
+
         try {
             await axios.post(`${apiLink}todo/`, newTodo, {
                 headers: {
@@ -26,18 +34,18 @@ const TodoForm = ({ setTodos, fetchData }) => {
                 },
             });
             setNewTodo({ body: "" });
-            setTodos((prevTodos) => [...prevTodos, newTodo]);
             fetchData();
+            Toast("success", "Todo created successfully!");
         } catch (error) {
             console.log(error);
         }
     };
 
-    // const handleKeyDown = (e) => {
-    //     if (e.key === 'Enter') {
-    //         postTodo();
-    //     }
-    // }
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            postTodo();
+        }
+    };
 
     return (
         <>
@@ -50,19 +58,22 @@ const TodoForm = ({ setTodos, fetchData }) => {
                     id="newtodo"
                     name="newtodo"
                     placeholder="Add Todo"
-                    value={newTodo.body}
+                    value={newTodo?.body}
                     className="input input-bordered input-info w-full max-w-xs"
-                    onChange={handleChange}
+                    onChange={(e) => {
+                        handleChange(e);
+                    }}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            postTodo();
-                        }
+                        handleKeyDown(e);
                     }}
                     autoComplete="off"
+                    required
                 />
 
                 <button
-                    onClick={postTodo}
+                    onClick={() => {
+                        postTodo();
+                    }}
                     className="btn btn-primary ml-2"
                     title="Add todo"
                 >

@@ -4,19 +4,19 @@ import axios from "axios";
 // import style
 import "./App.css";
 
+// utils
+import { apiLink } from "./utils/constants";
+
 // components
 import Table from "./components/Table";
 import TodoForm from "./components/TodoForm";
-import { apiLink } from "./utils/constants";
+
+// Ads
 import BestChange from "./components/ads/bestchange/BestChange";
 
 function App() {
     const [todos, setTodos] = useState("");
     const [isLoading, setisLoading] = useState(true);
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     const fetchData = async () => {
         try {
@@ -25,12 +25,15 @@ function App() {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            setTodos(response.data);
+            setTodos(response?.data);
             setisLoading(false);
         } catch (error) {
             console.log(error);
         }
     };
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
         <div className=" px-8 bg-indigo-100 min-h-screen ">

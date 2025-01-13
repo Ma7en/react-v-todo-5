@@ -9,6 +9,9 @@ import {
     MdOutlineCheckBoxOutlineBlank,
 } from "react-icons/md";
 
+// plugin
+import Toast from "../plugin/Toast";
+
 // utils
 import { apiLink } from "../utils/constants";
 
@@ -30,9 +33,8 @@ const Table = ({ todos, isLoading, setTodos }) => {
     const handleEdit = async (id, value) => {
         try {
             const response = await axios.patch(`${apiLink}todo/${id}/`, value);
-            // console.log(response.data);
             const newTodos = todos?.map((todo) =>
-                todo.id === id ? response.data : todo
+                todo?.id === id ? response?.data : todo
             );
             setTodos(newTodos);
         } catch (error) {
@@ -41,26 +43,34 @@ const Table = ({ todos, isLoading, setTodos }) => {
     };
 
     const handleChange = (e) => {
-        // console.log(e.target.value);
         setEditText((prev) => ({
             ...prev,
             body: e.target.value,
         }));
-        // console.log(editText);
     };
 
     const handleClick = () => {
-        handleEdit(editText.id, editText);
+        if (!editText?.body) {
+            Toast("error", "Enter Data!");
+            return;
+        }
+
+        handleEdit(editText?.id, editText);
         setEditText({
             body: "",
         });
     };
 
     const handleCheckbox = (id, value) => {
-        // console.log(value.completed);
         handleEdit(id, {
             completed: !value,
         });
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleClick();
+        }
     };
 
     return (
@@ -98,7 +108,7 @@ const Table = ({ todos, isLoading, setTodos }) => {
                             </>
                         ) : (
                             <>
-                                {todos.length > 0 &&
+                                {todos?.length > 0 &&
                                     todos?.map((todoItem, index) => (
                                         <tr
                                             key={index}
@@ -108,13 +118,13 @@ const Table = ({ todos, isLoading, setTodos }) => {
                                                 <span
                                                     onClick={() =>
                                                         handleCheckbox(
-                                                            todoItem.id,
-                                                            todoItem.completed
+                                                            todoItem?.id,
+                                                            todoItem?.completed
                                                         )
                                                     }
                                                     className="inline-block cursor-pointer"
                                                 >
-                                                    {todoItem.completed ===
+                                                    {todoItem?.completed ===
                                                     true ? (
                                                         <MdOutlineCheckBox />
                                                     ) : (
@@ -125,9 +135,9 @@ const Table = ({ todos, isLoading, setTodos }) => {
 
                                             <td
                                                 className="p-3 text-sm "
-                                                title={todoItem.id}
+                                                title={`${todoItem?.id}`}
                                             >
-                                                {todoItem.body}
+                                                {todoItem?.body}
                                             </td>
 
                                             <td className="p-3 text-sm  text-white">
@@ -146,7 +156,7 @@ const Table = ({ todos, isLoading, setTodos }) => {
 
                                             <td className="p-3 text-sm font-medium">
                                                 {new Date(
-                                                    todoItem.created
+                                                    todoItem?.created
                                                 ).toLocaleString()}
                                             </td>
 
@@ -168,7 +178,7 @@ const Table = ({ todos, isLoading, setTodos }) => {
                                                     <MdOutlineDeleteOutline
                                                         onClick={() =>
                                                             handleDelete(
-                                                                todoItem.id
+                                                                todoItem?.id
                                                             )
                                                         }
                                                     />
@@ -193,8 +203,13 @@ const Table = ({ todos, isLoading, setTodos }) => {
                             type="text"
                             name="text"
                             id="update_text"
-                            value={editText.body}
-                            onChange={handleChange}
+                            value={editText?.body}
+                            onChange={(e) => {
+                                handleChange(e);
+                            }}
+                            onKeyDown={(e) => {
+                                handleKeyDown(e);
+                            }}
                             placeholder="Type here"
                             className="input input-bordered w-full mt-8"
                         />
@@ -206,7 +221,9 @@ const Table = ({ todos, isLoading, setTodos }) => {
 
                             <label
                                 htmlFor="my-modal"
-                                onClick={handleClick}
+                                onClick={() => {
+                                    handleClick();
+                                }}
                                 className="btn btn-primary"
                             >
                                 Update
